@@ -1,0 +1,4 @@
+{
+    "watch": ["./build/*", "./src/.eslintrc"],
+    "exec": "webpack serve --config=build/webpack.dev.js"
+ }

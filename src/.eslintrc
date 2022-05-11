@@ -1,0 +1,39 @@
+{
+    "root": true,
+    "env": {
+        "browser": true,
+    },
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+        "requireConfigFile": false,
+        "babelOptions": {
+            "presets": ["@babel/preset-react"]
+        }
+    },
+    "plugins": [
+        "react"
+    ],
+    "extends": [
+        "eslint:recommended", 
+        "plugin:react/recommended"
+    ],
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+    },
+    "rules": {
+        "react/prop-types": "off",
+        "react/react-in-jsx-scope": "off",
+        "no-undef": "warn",
+        "no-unused-vars": ["warn", { "argsIgnorePattern": "_" }],
+        "no-useless-escape": "off",
+        "no-empty": "warn",
+        "react/no-unescaped-entities": "off",
+        "indent": ["error", 4],
+        "no-multiple-empty-lines": ["error", { "max": 1, "maxBOF": 1}]
+    },
+    "globals": {
+        "global": "writable"
+    }
+}

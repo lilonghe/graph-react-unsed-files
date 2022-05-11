@@ -1,0 +1,10 @@
+node_modules
+dist
+.DS_Store
+
+*.log
+.idea
+
+build/manifest.json
+
+package-lock.json
