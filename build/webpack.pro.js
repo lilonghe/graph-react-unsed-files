@@ -7,6 +7,9 @@ const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = merge(base, {
     mode: 'production',
+    output: {
+        publicPath: '/graph-react-unsed-files',
+    },
     plugins: [
         new CopyPlugin({
             patterns: [
