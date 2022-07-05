@@ -1,17 +1,44 @@
 
 const path = require('path');
 const dependencyTree = require('dependency-tree');
-const basicPath = path.resolve(__dirname, './src');
 const fs = require('fs');
+let basicPath, webpackPath, mainFilePath;
+
+console.log('====');
+console.log('Graph React unsed files generator');
+console.log('Default ignore node_modules directory');
+console.log('Visual link: https://www.lilonghe.net/graph-react-unsed-files/')
+console.log('====\n');
+
+process.argv.forEach((val) => {
+    if (val.startsWith('-d=')) {
+        let p = val.split('=')[1].trim();
+        basicPath = p;
+    } else if (val.startsWith('-w=')) {
+        let webpack = val.split('=')[1].trim();
+        webpackPath = webpack;
+    } else if (val.startsWith('-m=')) {
+        let m = val.split('=')[1].trim();
+        mainFilePath = m;
+    }
+});
+
+if (!basicPath || !webpackPath) {
+    console.log('-d= code directory, like `./src`');
+    console.log('-w= webpack config, like `./build/webpack.base.js`');
+    console.log('-m= main file[optional], like `./src/index.js`, default -d/index.js');
+    console.log('Please input params');
+    process.exit();
+}
 
 var tree = dependencyTree({
-    filename: './src/index.js',
-    directory: './src',
-    webpackConfig: './build/webpack.base',
+    filename: mainFilePath || path.join(basicPath,'/index.js'),
+    directory: basicPath,
+    webpackConfig: webpackPath,
     nodeModulesConfig: {
         entry: 'module'
     },
-  filter: path => path.indexOf('node_modules') === -1,
+    filter: path => !path.includes('node_modules'),
 });
 
 let allFile = [];
@@ -35,6 +62,9 @@ function readAllFile(dir, parent) {
     let currentDir = (parent + '/' + dir).replaceAll('//', '/');
     let list = [];
     let files = fs.readdirSync(currentDir).filter(file => !file.startsWith('.'));
+    if (dir.endsWith('node_modules')) {
+        return list;
+    }
 
     files.map(file => {
         let currentFile = (currentDir + '/' + file).replaceAll('//', '/');
@@ -62,12 +92,20 @@ function readAllFile(dir, parent) {
 }
 
 // file tree
-let newTree = objectToList(tree);
-
+objectToList(tree);
+if (allFile.length === 0) {
+    console.log(`Can't find file tree.`);
+    process.exit();
+}
 // folder tree
 let folderTree = readAllFile('', basicPath);
 
 // console.log(JSON.stringify(newTree))
 // console.log(JSON.stringify(folderTree))
 
-fs.writeFileSync('./unused.json', JSON.stringify(folderTree), { encoding: 'utf-8' })
+try{
+    fs.writeFileSync('./unused.json', JSON.stringify(folderTree), { encoding: 'utf-8' });
+    console.log('Generate success', './unused.json');
+}catch(err) {
+    console.log('Generate fail', err);
+}

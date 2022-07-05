@@ -1,10 +1,8 @@
 
 ## Find project unused js/jsx files.
 
-1. Add script `"check-unused": "node checkUnused.js"`
-2. Execute `npm run check-unused`
-3. Copy generated file `unused.json` to this project.
-4. Execute `npm start`
+1. Execute `node checkUnused.js` or download execute file and `./checkUnused-mac`
+2. Copy `unused.json` to this [link](https://www.lilonghe.net/graph-react-unsed-files/).
 
 
 Red title is unsed file.
