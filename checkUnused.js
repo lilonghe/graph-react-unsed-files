@@ -13,19 +13,19 @@ console.log('====\n');
 process.argv.forEach((val) => {
     if (val.startsWith('-d=')) {
         let p = val.split('=')[1].trim();
-        basicPath = p;
+        basicPath = path.resolve(p);
     } else if (val.startsWith('-w=')) {
         let webpack = val.split('=')[1].trim();
-        webpackPath = webpack;
+        webpackPath = path.resolve(webpack);
     } else if (val.startsWith('-m=')) {
         let m = val.split('=')[1].trim();
-        mainFilePath = m;
+        mainFilePath = path.resolve(m);
     }
 });
 
-if (!basicPath || !webpackPath) {
+if (!basicPath) {
     console.log('-d= code directory, like `./src`');
-    console.log('-w= webpack config, like `./build/webpack.base.js`');
+    console.log('-w= webpack config, use by alias import,[optional], like `./build/webpack.base.js`');
     console.log('-m= main file[optional], like `./src/index.js`, default -d/index.js');
     console.log('Please input params');
     process.exit();
@@ -46,9 +46,9 @@ function objectToList(obj) {
     let list = [];
     for (let key in obj) {
         let o = {
-            key: key.replace(basicPath, ''),
+            key,
         };
-        
+
         if (Object.keys(obj[key]).length > 0) {
             o.children = objectToList(obj[key]);
         }
@@ -79,8 +79,8 @@ function readAllFile(dir, parent) {
         if (!isFile) {
             item.children = readAllFile(file, currentDir);
             list.push(item)
-        } else if (file.endsWith('.js') || file.endsWith('.jsx')) {
-            if (allFile.find(item => basicPath + item === currentFile)) {
+        } else {
+            if (allFile.find(item => item === currentFile)) {
                 item.used = true;
             } else {
                 item.used = false;
@@ -99,9 +99,6 @@ if (allFile.length === 0) {
 }
 // folder tree
 let folderTree = readAllFile('', basicPath);
-
-// console.log(JSON.stringify(newTree))
-// console.log(JSON.stringify(folderTree))
 
 try{
     fs.writeFileSync('./unused.json', JSON.stringify(folderTree), { encoding: 'utf-8' });
