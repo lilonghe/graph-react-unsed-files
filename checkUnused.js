@@ -2,7 +2,7 @@
 const path = require('path');
 const dependencyTree = require('dependency-tree');
 const fs = require('fs');
-let basicPath, webpackPath, mainFilePath;
+let basicPath, webpackPath, mainFilePath, includes = [];
 
 console.log('====');
 console.log('Graph React unsed files generator');
@@ -20,6 +20,9 @@ process.argv.forEach((val) => {
     } else if (val.startsWith('-m=')) {
         let m = val.split('=')[1].trim();
         mainFilePath = path.resolve(m);
+    } else if (val.startsWith('-i=')) {
+        let i = val.split('=')[1].trim();
+        includes = i.split(',');
     }
 });
 
@@ -27,6 +30,7 @@ if (!basicPath) {
     console.log('-d= code directory, like `./src`');
     console.log('-w= webpack config, use by alias import,[optional], like `./build/webpack.base.js`');
     console.log('-m= main file[optional], like `./src/index.js`, default -d/index.js');
+    console.log('-i= includes file[optional], like `.js,.jsx`');
     console.log('Please input params');
     process.exit();
 }
@@ -79,7 +83,7 @@ function readAllFile(dir, parent) {
         if (!isFile) {
             item.children = readAllFile(file, currentDir);
             list.push(item)
-        } else {
+        } else if (!includes.length || includes.find(item => item.toLowerCase().endsWith(file.toLowerCase()))) {
             if (allFile.find(item => item === currentFile)) {
                 item.used = true;
             } else {
